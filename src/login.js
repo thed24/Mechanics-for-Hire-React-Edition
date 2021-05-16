@@ -3,7 +3,6 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
 import LoginNavBar from "./components/loginNavBar";
-import { Redirect } from "react-router-dom";
 import "./generic.css";
 
 const authUrl = `http://localhost:3000/auth`;
