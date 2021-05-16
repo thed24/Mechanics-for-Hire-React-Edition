@@ -3,8 +3,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios";
-import "./generic.css";
 import LoginNavBar from "./components/loginNavBar";
+import "./generic.css";
 
 const userUrl = `http://localhost:3000/users`;
 
@@ -22,19 +22,19 @@ export default function Register() {
 
   function handleSubmit(event) {
     event.preventDefault();
-    const user = {
-      email,
-      password,
-      name,
-      userType,
-    };
 
     axios({ method: "get", url: userUrl, params: { email } }).then((res) => {
-      console.log(res);
       if (res.data.users.length === 0) {
-        axios({ url: userUrl, body: user }).then(() => {
-          setLoggedInUser(email);
-        });
+        axios
+          .post(userUrl, {
+            name,
+            email,
+            password,
+            userType,
+          })
+          .then(() => {
+            setLoggedInUser(email);
+          });
       } else {
         setShow(true);
       }
@@ -43,20 +43,21 @@ export default function Register() {
 
   return (
     <>
-      <Modal show={show} onHide={setShow}>
+      <Modal show={show} onHide={() => setShow(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+          <Modal.Title>Error! Email already exists</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+        <Modal.Body>
+          The email you are trying to register already exists within our system,
+          try again.
+        </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={setShow}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={setShow}>
-            Save Changes
+          <Button variant="secondary" onClick={() => setShow(false)}>
+            Okay
           </Button>
         </Modal.Footer>
       </Modal>
+
       <div className="Auth">
         <LoginNavBar currentUser={loggedInUser}></LoginNavBar>
         <Form onSubmit={handleSubmit}>

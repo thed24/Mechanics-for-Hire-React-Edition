@@ -1,5 +1,6 @@
 var express = require("express");
 var mongoose = require("mongoose");
+var User;
 var app = express();
 
 var allowCrossDomain = function (req, res, next) {
@@ -10,13 +11,18 @@ var allowCrossDomain = function (req, res, next) {
 };
 
 app.use(allowCrossDomain);
+app.use(express.json());
 
 app.listen(3000, () => {
   console.log("Server running on port 3000");
 
   // Initialize DB
-  mongoose.connect("mongodb://localhost/assignment");
-  return mongoose.model(
+  mongoose.connect("mongodb://localhost/assignment", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+
+  User = mongoose.model(
     "User",
     new mongoose.Schema({
       name: String,
@@ -28,17 +34,14 @@ app.listen(3000, () => {
 });
 
 app.post("/users", function (req, res) {
-  const User = mongoose.models.User;
-
-  User(req.body).create(function (err) {
+  console.log(req.body);
+  User.create(req.body, function (err) {
     if (err) throw err;
     res.json({ success: true, message: "user saved successfully" });
   });
 });
 
 app.get("/users", function (req, res) {
-  const User = mongoose.models.User;
-
   User.find({ email: req.query.email }, function (err, docs) {
     if (err) throw err;
     res.json({ success: true, users: docs });
