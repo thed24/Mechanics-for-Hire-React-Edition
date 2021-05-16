@@ -7,13 +7,13 @@ import LoginNavBar from "./components/loginNavBar";
 import "./generic.css";
 
 const userUrl = `http://localhost:3000/users`;
+const authUrl = `http://localhost:3000/auth`;
 
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [userType, setUserType] = useState("");
-  const [loggedInUser, setLoggedInUser] = useState("");
   const [show, setShow] = useState("");
 
   function validateForm() {
@@ -23,18 +23,12 @@ export default function Register() {
   function handleSubmit(event) {
     event.preventDefault();
 
-    axios({ method: "get", url: userUrl, params: { email } }).then((res) => {
-      if (res.data.users.length === 0) {
-        axios
-          .post(userUrl, {
-            name,
-            email,
-            password,
-            userType,
-          })
-          .then(() => {
-            setLoggedInUser(email);
-          });
+    axios.get(userUrl, { email }).then((res) => {
+      const user = res.data.users.find((user) => user.email === email);
+      if (!user) {
+        axios.post(userUrl, { name, email, password, userType }).then(() => {
+          axios.post(authUrl, { email, password });
+        });
       } else {
         setShow(true);
       }
@@ -59,7 +53,7 @@ export default function Register() {
       </Modal>
 
       <div className="Auth">
-        <LoginNavBar currentUser={loggedInUser}></LoginNavBar>
+        <LoginNavBar></LoginNavBar>
         <Form onSubmit={handleSubmit}>
           <h4> Please register below</h4>
           <Form.Group size="lg" controlId="name">
