@@ -6,6 +6,7 @@ import LoginNavBar from "./components/loginNavBar";
 import "./generic.css";
 
 const authUrl = `http://localhost:3000/auth`;
+const userUrl = `http://localhost:3000/users`;
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -15,8 +16,17 @@ export default function Login() {
     return email.length > 0 && password.length > 0;
   }
 
-  function handleSubmit() {
-    axios.post(authUrl, { email, password });
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    axios.post(authUrl, { email, password }).then((res) => {
+      if (res.status === 200) {
+        axios.get(userUrl).then((res) => {
+          const user = res.data.users.find((user) => user.email === email);
+          localStorage.setItem("currentUser",JSON.stringify(user));
+        });
+      }
+    });
   }
 
   return (

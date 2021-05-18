@@ -23,11 +23,12 @@ export default function Register() {
   function handleSubmit(event) {
     event.preventDefault();
 
-    axios.get(userUrl, { email }).then((res) => {
+    axios.get(userUrl).then((res) => {
       const user = res.data.users.find((user) => user.email === email);
       if (!user) {
         axios.post(userUrl, { name, email, password, userType }).then(() => {
           axios.post(authUrl, { email, password });
+          localStorage.setItem("currentUser", JSON.stringify(user));
         });
       } else {
         setShow(true);
@@ -86,7 +87,7 @@ export default function Register() {
             <Form.Label>User Type</Form.Label>
             <Form.Control
               as="select"
-              defaultValue="User"
+              value="User"
               onChange={(e) => setUserType(e.target.value)}
             >
               <option value={userType}>User</option>

@@ -5,6 +5,10 @@
     padding-bottom: 60px 0;
   }
 
+  div.TableHolder {
+    padding: 60px;
+  }
+
   .Auth form {
     margin: 0 auto;
     max-width: 320px;

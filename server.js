@@ -3,6 +3,7 @@ var session = require("express-session");
 var mongoose = require("mongoose");
 var app = express();
 var User;
+var Advertisement;
 
 var allowCrossDomain = function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "http://localhost:3001");
@@ -38,6 +39,16 @@ app.listen(3000, () => {
       email: String,
       password: String,
       userType: String,
+    })
+  );
+
+  Advertisement = mongoose.model(
+    "Advertisement",
+    new mongoose.Schema({
+      name: String,
+      timeSlot: String,
+      booked: Boolean,
+      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     })
   );
 });
@@ -77,6 +88,7 @@ app.get("/auth", function (req, res) {
     res.json({
       success: true,
       message: "you are currently authenticated",
+      session: req.session,
       email: req.session.email,
     });
   } else {
@@ -98,5 +110,33 @@ app.get("/users", function (req, res) {
   User.find({}, function (err, docs) {
     if (err) throw err;
     res.json({ success: true, users: docs });
+  });
+});
+
+app.get("/advertisements", function (req, res) {
+  Advertisement.find({}).populate('user').exec(function (err, docs) {
+    if (err) throw err;
+    res.json({ success: true, advertisements: docs });
+  });
+});
+
+app.post("/advertisements", function (req, res) {
+  Advertisement.create(req.body, function (err) {
+    if (err) throw err;
+    res.json({ success: true, message: "advertisement created successfully" });
+  });
+});
+
+app.put("/advertisements", function (req, res) {
+  Advertisement.updateOne(req.body, function (err) {
+    if (err) throw err;
+    res.json({ success: true, message: "advertisement created successfully" });
+  });
+});
+
+app.delete("/advertisements", function (req, res) {
+  Advertisement.deleteOne(req.body, function (err) {
+    if (err) throw err;
+    res.json({ success: true, message: "advertisement created successfully" });
   });
 });
