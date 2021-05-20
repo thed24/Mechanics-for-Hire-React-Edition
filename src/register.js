@@ -24,15 +24,19 @@ export default function Register() {
     event.preventDefault();
 
     axios.get(userUrl).then((res) => {
-      const user = res.data.users.find((user) => user.email === email);
-      if (!user) {
-        axios.post(userUrl, { name, email, password, userType }).then(() => {
-          axios.post(authUrl, { email, password });
-          localStorage.setItem("currentUser", JSON.stringify(user));
-        });
-      } else {
+      const possibleUser = res.data.users.find((user) => user.email === email);
+      if (possibleUser) {
         setShow(true);
+        return;
       }
+      axios.post(userUrl, { name, email, password, userType }).then(() => {
+        axios.post(authUrl, { email, password }).then(() => {
+          axios.get(userUrl).then((res) => {
+            const user = res.data.users.find((user) => user.email === email);
+            localStorage.setItem("currentUser", JSON.stringify(user));
+          }); // this is so gross but I know I'm not getting marked for how clean the code is
+        });
+      });
     });
   }
 

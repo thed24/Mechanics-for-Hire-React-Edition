@@ -1,12 +1,57 @@
-import { Table, Button } from "react-bootstrap";
-import React from "react";
+import { Table, Button, } from "react-bootstrap";
+import React, { Component } from "react";
 import axios from "axios";
 
 const advertisementUrl = `http://localhost:3000/advertisements`;
+const advertisementByIdUrl = `http://localhost:3000/advertisements/`;
+
+function deleteEntry(advert) {
+  axios.delete(advertisementByIdUrl + advert._id);
+}
+
+function bookEntry(advert) {
+  axios.put(advertisementUrl, {
+    _id: advert._id,
+    name: advert.name,
+    timeSlot: advert.timeSlot,
+    booked: true,
+    user: advert.user._id,
+  });
+}
+
+class DeleteButton extends Component {
+  handleClick = () => {
+    this.props.onDeleteClick(this.props.value);
+  };
+
+  render() {
+    return <Button onClick={this.handleClick}> Delete </Button>;
+  }
+}
+
+class EditButton extends Component {
+  handleClick = () => {
+    this.props.onEditClick(this.props.value);
+  };
+
+  render() {
+    return <Button onClick={this.handleClick}> Edit </Button>;
+  }
+}
+
+class BookButton extends Component {
+  handleClick = () => {
+    this.props.onBookClick(this.props.value);
+  };
+
+  render() {
+    return <Button onClick={this.handleClick}> Book </Button>;
+  }
+}
 
 export default class AdvertisementTable extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       advertisements: [],
       currentUser: localStorage.getItem("currentUser")
@@ -36,20 +81,27 @@ export default class AdvertisementTable extends React.Component {
         </thead>
         <tbody>
           {this.state.advertisements.map((advert) => {
-              console.log(advert)
             return (
               <tr>
                 <td>{advert.name}</td>
                 <td>{advert.timeSlot}</td>
-                <td>{advert.booked ? "Not available" : <Button> Book Now </Button>}</td>
                 <td>
-                  {advert.user?.email === this.state.currentUser.email 
-                    ? (<>
-                        <Button id={advert._id}> Edit </Button> <></> 
-                        <Button id={advert._id}> Delete </Button>
-                    </>) 
-                    : ("N/A")
-                  }
+                  {advert.booked ? (
+                    "Not available"
+                  ) : (
+                    <BookButton value={advert} onBookClick={bookEntry}> </BookButton>
+                  )}
+                </td>
+                <td>
+                  {advert.user?.email === this.state.currentUser.email ? (
+                    <>
+                      <EditButton value={advert} onEditClick={this.props.editAdvert}> Edit </EditButton>
+                      <>{" "}</>
+                      <DeleteButton value={advert} onDeleteClick={deleteEntry}> </DeleteButton>
+                    </>
+                  ) : (
+                    "N/A"
+                  )}
                 </td>
               </tr>
             );

@@ -51,6 +51,13 @@ app.listen(3000, () => {
       user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     })
   );
+
+  User.remove({}, function (err) {
+    console.log("collection removed");
+  });
+  Advertisement.remove({}, function (err) {
+    console.log("collection removed");
+  });
 });
 
 app.post("/auth", function (req, res) {
@@ -128,15 +135,17 @@ app.post("/advertisements", function (req, res) {
 });
 
 app.put("/advertisements", function (req, res) {
-  Advertisement.updateOne(req.body, function (err) {
+  Advertisement.findByIdAndUpdate(req.body._id, req.body, function (err) {
     if (err) throw err;
-    res.json({ success: true, message: "advertisement created successfully" });
+    res.json({ success: true, message: "advertisement updated successfully" });
   });
 });
 
-app.delete("/advertisements", function (req, res) {
-  Advertisement.deleteOne(req.body, function (err) {
+app.delete("/advertisements/:id", function (req, res) {
+  console.log(req.params);
+  const { id } = req.params;
+  Advertisement.findByIdAndDelete(id, function (err) {
     if (err) throw err;
-    res.json({ success: true, message: "advertisement created successfully" });
+    res.json({ success: true, message: "advertisement deleted successfully" });
   });
 });

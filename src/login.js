@@ -23,7 +23,7 @@ export default function Login() {
       if (res.status === 200) {
         axios.get(userUrl).then((res) => {
           const user = res.data.users.find((user) => user.email === email);
-          localStorage.setItem("currentUser",JSON.stringify(user));
+          localStorage.setItem("currentUser", JSON.stringify(user));
         });
       }
     });

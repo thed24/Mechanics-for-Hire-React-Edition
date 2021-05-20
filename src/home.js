@@ -12,27 +12,47 @@ export default function Home() {
     ? JSON.parse(localStorage.getItem("currentUser"))
     : null;
   const [name, setName] = useState("");
+  const [booked, setBooked] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
   const [show, setShow] = useState("");
+  const [id, setId] = useState("");
+
+  function openModalForUpdate(advert){
+    setId(advert._id);
+    setBooked(advert.booked);
+    setShow(true);
+  }
   
   function validateForm() {
-    return name.length > 0 && timeSlot.length > 0;
+    return name?.length > 0 && timeSlot?.length > 0;
   }
 
   function validateButton() {
     return currentUser;
   }
 
-  function handleSubmit(e) {
-    axios.post(advertisementUrl, {
-      name,
-      timeSlot,
-      booked: "false",
-      user: {currentUser},
-    });
+  function handleSubmit() {
+    if (id) {
+      axios.put(advertisementUrl, {
+        _id: id,
+        name,
+        timeSlot,
+        booked,
+        user: currentUser._id,
+      });
+    } else {
+      axios.post(advertisementUrl, {
+        name,
+        timeSlot,
+        booked: false,
+        user: currentUser._id,
+      });
+    }
 
-    setName("");
-    setTimeSlot("");
+    setBooked(null);
+    setName(null);
+    setId(null);
+    setTimeSlot(null);
     setShow(false);
   }
 
@@ -41,8 +61,10 @@ export default function Home() {
       <div className="Login">
         <LoginNavBar></LoginNavBar>
         <h2> Welcome to Mechanics for Hire! </h2>
-        <div class="TableHolder">
-          <AdvertisementTable></AdvertisementTable>
+        <div className="TableHolder">
+          <AdvertisementTable
+            editAdvert={openModalForUpdate}
+          ></AdvertisementTable>
           <Button
             block
             size="lg"
